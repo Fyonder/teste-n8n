@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    restart: always
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=admin123
+      - N8N_PORT=5678
+      - N8N_HOST=n8n
+      - WEBHOOK_URL=https://your-app.onrender.com
+      - GENERIC_TIMEZONE=America/Sao_Paulo
+    ports:
+      - "5678:5678"
+    depends_on:
+      - server
+
+  evolution:
+    image: atendai/evolution-api
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      - SERVER_PORT=8080
+      - AUTHENTICATION_API_KEY=123456
+      - LICENSE_KEY=EVO-TESTE-KEY
+      - QRCODE_LIMIT=1
+      - WEBHOOK_GLOBAL_ENABLED=true
+      - WEBHOOK_GLOBAL_URL=http://n8n:5678/webhook/evolution
+    depends_on:
+      - n8n
+
+  server:
+    build: .
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - EVOLUTION_URL=http://evolution:8080
+      - N8N_URL=http://n8n:5678
