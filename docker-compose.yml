@@ -5,17 +5,13 @@ services:
     image: n8nio/n8n:latest
     restart: always
     environment:
-      - N8N_BASIC_AUTH_ACTIVE=true
-      - N8N_BASIC_AUTH_USER=admin
-      - N8N_BASIC_AUTH_PASSWORD=admin123
-      - N8N_PORT=5678
-      - N8N_HOST=n8n
-      - WEBHOOK_URL=https://your-app.onrender.com
-      - GENERIC_TIMEZONE=America/Sao_Paulo
-    ports:
-      - "5678:5678"
-    depends_on:
-      - server
+      - N8N_BASIC_AUTH_ACTIVE=${N8N_BASIC_AUTH_ACTIVE}
+      - N8N_BASIC_AUTH_USER=${N8N_BASIC_AUTH_USER}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_BASIC_AUTH_PASSWORD}
+      - N8N_HOST=${N8N_HOST}
+      - N8N_PORT=${N8N_PORT}
+      - WEBHOOK_URL=${WEBHOOK_URL}
+      - GENERIC_TIMEZONE=${GENERIC_TIMEZONE}
 
   evolution:
     image: atendai/evolution-api
@@ -23,21 +19,22 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - SERVER_PORT=8080
-      - AUTHENTICATION_API_KEY=123456
-      - LICENSE_KEY=EVO-TESTE-KEY
-      - QRCODE_LIMIT=1
-      - WEBHOOK_GLOBAL_ENABLED=true
-      - WEBHOOK_GLOBAL_URL=http://n8n:5678/webhook/evolution
+      - SERVER_PORT=${EVOLUTION_PORT}
+      - AUTHENTICATION_API_KEY=${EVOLUTION_AUTHENTICATION_API_KEY}
+      - LICENSE_KEY=${EVOLUTION_LICENSE_KEY}
+      - QRCODE_LIMIT=${EVOLUTION_QRCODE_LIMIT}
+      - WEBHOOK_GLOBAL_ENABLED=${EVOLUTION_WEBHOOK_GLOBAL_ENABLED}
+      - WEBHOOK_GLOBAL_URL=${EVOLUTION_WEBHOOK_GLOBAL_URL}
     depends_on:
       - n8n
 
   server:
     build: .
     restart: always
-    ports:
-      - "3000:3000"
     environment:
-      - PORT=3000
-      - EVOLUTION_URL=http://evolution:8080
-      - N8N_URL=http://n8n:5678
+      - PORT=${PORT}
+      - EVOLUTION_URL=${EVOLUTION_URL}
+      - N8N_URL=${N8N_URL}
+    depends_on:
+      - n8n
+      - evolution
